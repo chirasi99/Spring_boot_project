@@ -1,7 +1,9 @@
 package com.example.Springboot_CRUD;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeviceService {
@@ -18,9 +20,15 @@ public class DeviceService {
     }
 
     public String deleteDevice(int device_id){
-        Device device = dao.getById(device_id);
-        dao.delete(device);
-        return "Device Number is deleted: " + device_id;
+        Optional<Device> optionalDevice = dao.findById(device_id);
+        if(optionalDevice.isPresent()){
+            Device device = optionalDevice.get();
+            dao.delete(device);
+            return "Device Number is deleted: " + device_id;
+        }
+        else{
+            return "Device with ID " + device_id + " not found";
+        }
     }
 
     public String updateDevice(Device device){
@@ -28,6 +36,8 @@ public class DeviceService {
         return "Device Number is update : " + device.getDevice_id();
     }
     public Device getDevice(int device_id){
-        return dao.findById(device_id).get();
+        Optional<Device> optionalDevice = dao.findById(device_id);
+        return optionalDevice.orElse(null);
     }
+
 }
